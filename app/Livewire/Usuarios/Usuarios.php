@@ -3,6 +3,7 @@
 namespace App\Livewire\Usuarios;
 
 use App\Models\Dado;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\Attributes\On;
@@ -214,10 +215,10 @@ class Usuarios extends Component
 
     public function lerUsuario($id)
     {
-        
+
         $this->usuarioParaVisualizar = Dado::find($id);
     }
-    
+
 
     public function atualizarUsuario()
     {
@@ -275,7 +276,7 @@ class Usuarios extends Component
     public function deleteUser($userId)
     {
 
-        
+
         try {
             DB::beginTransaction();
             $user = Dado::findOrFail($userId);
@@ -286,5 +287,59 @@ class Usuarios extends Component
             DB::rollback();
             $this->emit('alerta', [2, "Ocorreu um erro ao apagar os registros"]);
         }
+    }
+
+
+
+    public function exportarPdf()
+    {
+        $dados = [];
+
+        $pdf = Pdf::loadView('livewire.usuarios.usuarios-pdf', compact('dados'));
+        $pdf->setPaper('a4', 'portrait');
+
+        return $pdf->download('users-details.pdf');   
+    }
+
+    public function exportarCsv()
+    {
+        $dados = Dado::all(); // Altere para a consulta que você precisa
+
+        $headers = [
+            'Nome',
+            'Email',
+            'CPF',
+            'Telefone',
+            'CEP',
+            'Endereço',
+            'Número',
+            'Complemento',
+            'Bairro',
+            'Cidade',
+            'Estado',
+            'Data de Nascimento',
+        ];
+
+        $csv = implode(',', $headers) . "\n";
+        foreach ($dados as $dado) {
+            $csv .= implode(',', [
+                $dado->name,
+                $dado->email,
+                $dado->cpf,
+                $dado->telefone,
+                $dado->cep,
+                $dado->endereco,
+                $dado->numero,
+                $dado->complemento,
+                $dado->bairro,
+                $dado->cidade,
+                $dado->estado,
+                $dado->data_nascimento,
+            ]) . "\n";
+        }
+
+        return response()->streamDownload(function () use ($csv) {
+            echo $csv;
+        }, 'usuarios.csv');
     }
 }

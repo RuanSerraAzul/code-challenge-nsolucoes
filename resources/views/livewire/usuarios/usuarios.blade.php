@@ -160,6 +160,10 @@
             .btn-logout:hover {
                 background-color: #d06b49;
             }
+
+            .align-right {
+                float: right;
+            }
         </style>
     </head>
 
@@ -185,7 +189,7 @@
 
             <div class="row mt-4">
                 <div class="col-md-12 table-container p-4">
-                    
+
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div class="input-group search-bar">
@@ -266,7 +270,10 @@
                             </tbody>
                         </table>
 
-
+                        <div class="text-end">
+                            <button class="btn btn-primary" disabled wire:click="exportarPdf">Exportar PDF</button>
+                            <button class="btn btn-primary" wire:click="exportarCsv">Exportar CSV</button>
+                        </div>
 
                     </div>
                     {{ $dados->links() }}
